@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: key-server
+    runtime: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: ADMIN_KEY
+        generateValue: true
