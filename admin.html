@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Quản lý Key</title>
+<style>
+:root{--bg:#0b1020;--card:#141b34;--card2:#1b2447;--line:#263059;--tx:#e8ecff;--mut:#8b96c4;--pri:#6c7bff;--pri2:#8a5cff;
+--ok:#2ecc8f;--warn:#f5b942;--bad:#ff5d73;--gray:#7d87ad;--r:16px}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:radial-gradient(1200px 600px at 10% -10%,#1b2450 0%,var(--bg) 60%) fixed;color:var(--tx);
+font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+body{padding:calc(env(safe-area-inset-top) + 14px) 14px calc(env(safe-area-inset-bottom) + 30px)}
+.wrap{max-width:900px;margin:0 auto}
+h1{font-size:20px;margin:0;display:flex;align-items:center;gap:10px}
+.logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--pri),var(--pri2));display:grid;place-items:center;font-size:18px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px}
+input,select,textarea,button{font:inherit;color:var(--tx)}
+input,textarea{width:100%;background:#0f1530;border:1px solid var(--line);border-radius:12px;padding:11px 12px;outline:none}
+input:focus,textarea:focus{border-color:var(--pri)}
+textarea{min-height:90px;resize:vertical;font-family:ui-monospace,Menlo,monospace;font-size:13px}
+label{display:block;font-size:12px;color:var(--mut);margin:0 0 5px}
+button{border:0;border-radius:12px;padding:10px 14px;background:var(--card2);cursor:pointer;font-weight:600}
+button:active{transform:scale(.97)}
+.btn-pri{background:linear-gradient(135deg,var(--pri),var(--pri2))}
+.btn-sm{padding:7px 11px;font-size:13px;border-radius:10px}
+.btn-bad{background:rgba(255,93,115,.16);color:#ff8a9a}
+.btn-ok{background:rgba(46,204,143,.16);color:#6fe3b4}
+.btn-warn{background:rgba(245,185,66,.16);color:#f7cd78}
+.btn-ghost{background:transparent;border:1px solid var(--line);color:var(--mut)}
+.row{display:flex;gap:10px}.row>*{flex:1;min-width:0}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.mt{margin-top:12px}.hide{display:none!important}
+#login{max-width:380px;margin:12vh auto 0;text-align:center}
+#login .logo{margin:0 auto 12px;width:52px;height:52px;font-size:26px;border-radius:15px}
+#login h1{justify-content:center;margin-bottom:6px}
+.err{color:var(--bad);font-size:13px;min-height:18px;margin-top:8px}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 6px;text-align:center;cursor:pointer}
+.stat b{display:block;font-size:20px}.stat span{font-size:11px;color:var(--mut)}
+.stat.on{border-color:var(--pri);background:var(--card2)}
+.tools{display:flex;gap:8px;margin:12px 0}
+.tools input{flex:1}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.chip{background:#0f1530;border:1px solid var(--line);color:var(--mut);padding:6px 10px;border-radius:999px;font-size:12px;cursor:pointer}
+.chip:active{background:var(--card2)}
+.k{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;margin-bottom:10px}
+.k .head{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.kk{font:600 14px ui-monospace,Menlo,monospace;word-break:break-all;cursor:pointer}
+.badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.b-active{background:rgba(46,204,143,.16);color:var(--ok)}
+.b-unused{background:rgba(125,135,173,.18);color:var(--gray)}
+.b-expired{background:rgba(245,185,66,.16);color:var(--warn)}
+.b-revoked{background:rgba(255,93,115,.16);color:var(--bad)}
+.meta{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;margin:10px 0;font-size:12.5px}
+.meta div span{display:block;color:var(--mut);font-size:11px}
+.acts{display:flex;gap:6px;flex-wrap:wrap}
+.note{font-size:12px;color:var(--mut);margin-top:2px}
+.empty{text-align:center;color:var(--mut);padding:30px}
+#toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 24px);transform:translateX(-50%) translateY(20px);
+background:#222b52;border:1px solid var(--line);padding:10px 16px;border-radius:12px;opacity:0;transition:.25s;pointer-events:none;z-index:9;max-width:90%}
+#toast.on{opacity:1;transform:translateX(-50%)}
+.sheet{position:fixed;inset:0;background:rgba(5,8,20,.7);display:flex;align-items:flex-end;justify-content:center;z-index:8}
+.sheet .card{width:100%;max-width:560px;border-radius:20px 20px 0 0;max-height:85vh;overflow:auto;padding-bottom:calc(env(safe-area-inset-bottom) + 16px)}
+@media(min-width:600px){.sheet{align-items:center}.sheet .card{border-radius:20px}}
+@media(max-width:460px){.stats{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div id="login" class="card">
+  <div class="logo">🔑</div>
+  <h1>Quản lý Key</h1>
+  <p style="color:var(--mut);margin:0 0 14px">Nhập mật khẩu admin để tiếp tục</p>
+  <input id="pw" type="password" placeholder="ADMIN_KEY" autocomplete="current-password">
+  <button class="btn-pri mt" style="width:100%" id="loginBtn">Đăng nhập</button>
+  <div class="err" id="loginErr"></div>
+</div>
+
+<div id="app" class="hide">
+  <div class="top">
+    <h1><span class="logo">🔑</span>Quản lý Key</h1>
+    <div style="display:flex;gap:8px">
+      <button class="btn-sm" id="refresh">Làm mới</button>
+      <button class="btn-sm btn-ghost" id="logout">Thoát</button>
+    </div>
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="card">
+    <button class="btn-pri" style="width:100%" id="toggleAdd">＋ Thêm key mới</button>
+    <div id="addBox" class="hide mt">
+      <label>Thời hạn (tính từ lúc người dùng kích hoạt)</label>
+      <div class="grid3">
+        <div><input id="dD" type="number" min="0" inputmode="numeric" placeholder="0"><label style="margin:4px 0 0">ngày</label></div>
+        <div><input id="dH" type="number" min="0" inputmode="numeric" placeholder="0"><label style="margin:4px 0 0">giờ</label></div>
+        <div><input id="dM" type="number" min="0" inputmode="numeric" placeholder="0"><label style="margin:4px 0 0">phút</label></div>
+      </div>
+      <div class="chips" id="presets"></div>
+      <div class="row mt">
+        <div><label>Số lượng key (tối đa 200)</label><input id="cnt" type="number" min="1" max="200" value="1" inputmode="numeric"></div>
+        <div><label>Tiền tố</label><input id="pre" value="QDONENLITE"></div>
+      </div>
+      <div class="mt"><label>Ghi chú (không bắt buộc)</label><input id="note" placeholder="vd: khách A"></div>
+      <div class="mt"><label>Hoặc dán key tự đặt, mỗi dòng một key (nếu điền, bỏ qua số lượng và tiền tố)</label><textarea id="custom" placeholder="MYKEY-0001"></textarea></div>
+      <button class="btn-pri mt" style="width:100%" id="create">Tạo key</button>
+    </div>
+  </div>
+
+  <div class="tools"><input id="q" placeholder="Tìm key, máy, ghi chú…" type="search"></div>
+  <div id="list"></div>
+</div>
+</div>
+
+<div id="sheet" class="sheet hide"><div class="card" id="sheetBody"></div></div>
+<div id="toast"></div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let AK = sessionStorage.getItem("ak") || "";
+let DATA = { keys: [], stats: {}, now: Date.now() };
+let FILTER = "all", Q = "";
+const STAT_LABELS = { all: "Tất cả", active: "Đang dùng", unused: "Chưa dùng", expired: "Hết hạn", revoked: "Thu hồi" };
+const BADGE = { active: "Đang dùng", unused: "Chưa dùng", expired: "Hết hạn", revoked: "Đã thu hồi" };
+
+function h(tag, attrs, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (k === "class") e.className = v;
+    else if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
+    else e.setAttribute(k, v);
+  }
+  for (const c of kids) if (c != null) e.append(c.nodeType ? c : document.createTextNode(c));
+  return e;
+}
+function toast(t) { const el = $("toast"); el.textContent = t; el.classList.add("on"); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove("on"), 2200); }
+async function copy(text) {
+  try { await navigator.clipboard.writeText(text); toast("Đã sao chép"); }
+  catch (_) { const t = h("textarea"); t.value = text; document.body.append(t); t.select(); document.execCommand("copy"); t.remove(); toast("Đã sao chép"); }
+}
+async function api(path, method = "GET", body) {
+  const r = await fetch("/admin/api" + path, { method, headers: { "x-admin-key": AK, "Content-Type": "application/json" }, body: body ? JSON.stringify(body) : undefined });
+  if (r.status === 401) { logout(true); throw new Error("401"); }
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error || r.status);
+  return j;
+}
+function dur(ms) {
+  if (!ms) return "Vĩnh viễn";
+  let m = Math.round(ms / 60000), d = Math.floor(m / 1440); m -= d * 1440;
+  const hr = Math.floor(m / 60); m -= hr * 60;
+  return [d && d + " ngày", hr && hr + " giờ", m && m + " phút"].filter(Boolean).join(" ") || "0";
+}
+function fmt(ts) { return ts ? new Date(ts).toLocaleString("vi-VN", { hour12: false, day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "—"; }
+function remain(ts) {
+  if (!ts) return "Vĩnh viễn";
+  const left = ts - Date.now();
+  return left <= 0 ? "Đã hết" : "Còn " + dur(left);
+}
+
+function logout(silent) {
+  sessionStorage.removeItem("ak"); AK = "";
+  $("app").classList.add("hide"); $("login").classList.remove("hide");
+  if (silent) $("loginErr").textContent = "Mật khẩu không đúng hoặc phiên đã hết";
+}
+async function login() {
+  AK = $("pw").value.trim(); if (!AK) return;
+  $("loginErr").textContent = "";
+  try { await load(); sessionStorage.setItem("ak", AK); show(); }
+  catch (e) { if (e.message !== "401") $("loginErr").textContent = "Không kết nối được server, thử lại"; }
+}
+function show() { $("login").classList.add("hide"); $("app").classList.remove("hide"); }
+async function load() { DATA = await api("/keys"); render(); }
+
+function render() {
+  const s = DATA.stats;
+  const st = $("stats"); st.replaceChildren();
+  for (const k of ["all", "active", "unused", "expired", "revoked"]) {
+    const n = k === "all" ? s.total : s[k];
+    st.append(h("div", { class: "stat" + (FILTER === k ? " on" : ""), onclick: () => { FILTER = k; render(); } },
+      h("b", {}, String(n || 0)), h("span", {}, STAT_LABELS[k])));
+  }
+  const q = Q.toLowerCase();
+  const rows = DATA.keys.filter((x) => (FILTER === "all" || x.status === FILTER) &&
+    (!q || (x.key + " " + (x.device || "") + " " + x.note).toLowerCase().includes(q)))
+    .sort((a, b) => (b.activatedAt || b.createdAt) - (a.activatedAt || a.createdAt));
+  const list = $("list"); list.replaceChildren();
+  if (!rows.length) { list.append(h("div", { class: "empty" }, "Không có key nào")); return; }
+  for (const x of rows.slice(0, 300)) list.append(card(x));
+  if (rows.length > 300) list.append(h("div", { class: "empty" }, "Đang hiển thị 300 key đầu, hãy dùng ô tìm kiếm"));
+}
+
+function card(x) {
+  const acts = h("div", { class: "acts" });
+  if (x.status === "revoked") acts.append(h("button", { class: "btn-sm btn-ok", onclick: () => act(x.key, "restore", "Khôi phục key này?") }, "Khôi phục"));
+  else acts.append(h("button", { class: "btn-sm btn-bad", onclick: () => act(x.key, "revoke", "Thu hồi key này? Người dùng sẽ bị khóa.") }, "Thu hồi"));
+  acts.append(
+    h("button", { class: "btn-sm btn-warn", onclick: () => act(x.key, "reset", "Gỡ thiết bị? Key giữ nguyên hạn, có thể dùng trên máy khác.", { mode: "device" }) }, "Reset máy"),
+    h("button", { class: "btn-sm", onclick: () => act(x.key, "reset", "Reset toàn bộ? Key về trạng thái chưa dùng, hạn tính lại từ lần kích hoạt mới.", { mode: "full" }) }, "Reset hết"),
+    h("button", { class: "btn-sm btn-ghost", onclick: () => del(x.key) }, "Xóa"));
+  return h("div", { class: "k" },
+    h("div", { class: "head" },
+      h("div", {}, h("div", { class: "kk", onclick: () => copy(x.key) }, x.key), x.note ? h("div", { class: "note" }, x.note) : null),
+      h("span", { class: "badge b-" + x.status }, BADGE[x.status])),
+    h("div", { class: "meta" },
+      h("div", {}, h("span", {}, "Thời hạn gói"), dur(x.durationMs)),
+      h("div", {}, h("span", {}, "Còn lại"), x.status === "unused" ? "Chưa kích hoạt" : x.status === "revoked" ? "—" : remain(x.expiresAt)),
+      h("div", {}, h("span", {}, "Kích hoạt lúc"), fmt(x.activatedAt)),
+      h("div", {}, h("span", {}, "Hết hạn lúc"), x.expiresAt ? fmt(x.expiresAt) : (x.activatedAt ? "Vĩnh viễn" : "—")),
+      h("div", { style: "grid-column:1/-1" }, h("span", {}, "Thiết bị"), x.device ? x.device : "—")),
+    acts);
+}
+
+async function act(key, what, msg, body) {
+  if (!confirm(msg)) return;
+  try { await api("/keys/" + encodeURIComponent(key) + "/" + what, "POST", body || {}); toast("Đã cập nhật"); await load(); }
+  catch (e) { toast("Lỗi: " + e.message); }
+}
+async function del(key) {
+  if (!confirm("Xóa vĩnh viễn key " + key + "?")) return;
+  try { await api("/keys/" + encodeURIComponent(key), "DELETE"); toast("Đã xóa"); await load(); }
+  catch (e) { toast("Lỗi: " + e.message); }
+}
+
+// ---- Thêm key ----
+const PRESETS = [["1 giờ", 0, 1, 0], ["4 giờ", 0, 4, 0], ["1 ngày", 1, 0, 0], ["3 ngày", 3, 0, 0], ["7 ngày", 7, 0, 0], ["30 ngày", 30, 0, 0], ["Vĩnh viễn", 0, 0, 0]];
+for (const [t, d, hr, m] of PRESETS)
+  $("presets").append(h("span", { class: "chip", onclick: () => { $("dD").value = d || ""; $("dH").value = hr || ""; $("dM").value = m || ""; } }, t));
+
+function sheet(node) { const b = $("sheetBody"); b.replaceChildren(node); $("sheet").classList.remove("hide"); }
+$("sheet").addEventListener("click", (e) => { if (e.target === $("sheet")) $("sheet").classList.add("hide"); });
+
+async function create() {
+  const ms = ((+$("dD").value || 0) * 1440 + (+$("dH").value || 0) * 60 + (+$("dM").value || 0)) * 60000;
+  const custom = $("custom").value.split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
+  const body = { durationMs: ms, count: +$("cnt").value || 1, prefix: $("pre").value, note: $("note").value, custom };
+  $("create").disabled = true;
+  try {
+    const r = await api("/keys", "POST", body);
+    const box = h("div", {},
+      h("h1", { style: "font-size:17px;margin-bottom:4px" }, "Đã tạo " + r.created.length + " key"),
+      h("div", { class: "note" }, "Thời hạn: " + dur(ms) + (ms ? " (tính từ lúc kích hoạt)" : "")),
+      r.skipped.length ? h("div", { class: "note", style: "color:var(--warn)" }, "Bỏ qua " + r.skipped.length + " key (trùng hoặc sai định dạng)") : null,
+      h("textarea", { class: "mt", readonly: "", style: "min-height:140px" }, r.created.join("\n")),
+      h("div", { class: "row mt" },
+        h("button", { class: "btn-pri", onclick: () => copy(r.created.join("\n")) }, "Sao chép tất cả"),
+        h("button", { onclick: () => $("sheet").classList.add("hide") }, "Đóng")));
+    sheet(box); $("custom").value = ""; await load();
+  } catch (e) { toast("Lỗi: " + e.message); }
+  $("create").disabled = false;
+}
+
+$("loginBtn").onclick = login;
+$("pw").addEventListener("keydown", (e) => { if (e.key === "Enter") login(); });
+$("logout").onclick = () => logout(false);
+$("refresh").onclick = () => load().then(() => toast("Đã làm mới")).catch(() => {});
+$("toggleAdd").onclick = () => $("addBox").classList.toggle("hide");
+$("create").onclick = create;
+$("q").addEventListener("input", (e) => { Q = e.target.value; render(); });
+setInterval(() => { if (AK && !document.hidden) load().catch(() => {}); }, 30000);
+if (AK) load().then(show).catch(() => {});
+</script>
+</body>
+</html>
